@@ -82,6 +82,10 @@
                 function withText($value){
                     return $value['reviewText'] !== '';
                 }
+                
+                function withoutText($value){
+                    return $value['reviewText'] == '';
+                }
                 function minRaiting($value){
                     $compare = $_POST['mraiting'];
                     return $value['rating'] >= $compare;
@@ -91,12 +95,16 @@
                 //Filtering
                 if(isset($_POST['text']) && $_POST['text'] =='yes'){
                     $filteredData = array_filter($data, 'withText');
+                    $filtered_Data = array_filter($data, 'withoutText');
                 }
                 else{
                     $filteredData = $data;
                 }
                 if(isset($_POST['mraiting'])){                    
                     $filteredData = array_filter($filteredData, 'minRaiting');
+                    if(isset($_POST['text']) && $_POST['text'] =='yes'){
+                        $filtered_Data = array_filter($filtered_Data, 'minRaiting');
+                    }
                 }
 
                 //Sort
@@ -132,7 +140,40 @@
                     }
                 }
 
-                
+                //SORT IF TEXT YES
+                if(isset($_POST['text']) && $_POST['text'] =='yes'){
+                    if(isset($_POST['date'])){
+                        $date = $_POST['date'];
+                        if($date=="low"){
+                            function sort_ByDate($a, $b) {
+                                return $a['reviewCreatedOnDate'] > $b['reviewCreatedOnDate'];
+                            }
+                            usort($filtered_Data, 'sort_ByDate');
+                        }
+                        else{
+                            function sort_ByDate($a, $b) {
+                                return $b['reviewCreatedOnDate'] > $a['reviewCreatedOnDate'];
+                            }
+                            usort($filtered_Data, 'sort_ByDate');
+                        }
+                    }
+    
+                    if(isset($_POST['raiting'])){
+                        $rating = $_POST['raiting'];
+                        if($rating=="low"){
+                            function sort_ByRating($a, $b) {
+                                return $a['rating'] > $b['rating'];
+                            }
+                            usort($filtered_Data, 'sort_ByRating');
+                        }
+                        else{
+                            function sort_ByRating($a, $b) {
+                                return $b['rating'] > $a['rating'];
+                            }
+                            usort($filtered_Data, 'sort_ByRating');
+                        }
+                    }
+                }
                 
 
                 //list
@@ -142,6 +183,17 @@
                     }    
                     echo "<br>";
                 }
+
+                
+                if(isset($_POST['text']) && $_POST['text'] =='yes'){    
+                    foreach($filtered_Data as $a){
+                        foreach($a as $key => $value){
+                                echo $key . " : " . $value . "<br />";                        
+                        }    
+                        echo "<br>";
+                    }
+                }
+
             ?>
         </div>
     </div>
